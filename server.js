@@ -1,6 +1,8 @@
 const express = require("express");
 const server = express();
 const db = require("./data/db-config");
+const bool = require("./utils");
+const { checkProjects, checkTasks } = bool;
 
 server.use(express.json());
 
@@ -26,6 +28,24 @@ server.post("/api/resources", (req, res) => {
     })
     .then(id => {
       res.status(200).json(id);
+    });
+});
+
+server.get("/api/projects", (req, res) => {
+  db("projects").then(projects => {
+    res.status(200).json(checkProjects(projects));
+  });
+});
+
+server.post("/api/projects", (req, res) => {
+  const { project_name, project_description } = req.body;
+  if (!project_name) {
+    res.status(404).json({ err: "project_name field is required" });
+  }
+  db("projects")
+    .insert({ project_name, project_description })
+    .then(id => {
+      res.status(200).json({ message: "success!", id: id[0] });
     });
 });
 
