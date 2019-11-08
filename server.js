@@ -50,9 +50,18 @@ server.post("/api/projects", (req, res) => {
 });
 
 server.get("/api/tasks", (req, res) => {
-  db("tasks").then(tasks => {
-    res.status(200).json(checkTasks(tasks));
-  });
+  db.select(
+    "p.project_name",
+    "t.task_description",
+    "p.project_description",
+    "t.task_completed",
+    "p.project_completed"
+  )
+    .from("projects as p")
+    .join("tasks as t", "t.project_id", "p.id")
+    .then(task => {
+      res.status(200).json(checkProjects(checkTasks(task)));
+    });
 });
 
 server.get("/api/tasks/:id", (req, res) => {
@@ -69,6 +78,41 @@ server.get("/api/tasks/:id", (req, res) => {
     .where({ "t.project_id": id })
     .then(task => {
       res.status(200).json(checkProjects(checkTasks(task)));
+    });
+});
+
+// tasks: descriptiion! notes, completed
+// projects: name!, description, completed
+
+server.post("/api/tasks", (req, res) => {
+  const {
+    project_name,
+    project_description,
+    project_completed,
+    project_id
+  } = req.body;
+  const { task_description, task_notes, task_completed } = req.body;
+  const newProject = {
+    project_name,
+    project_description,
+    project_completed
+  };
+  const newTask = { task_description, task_notes, task_completed, project_id };
+  if (!project_name || !task_description) {
+    res
+      .status(404)
+      .json({ err: "you must provide a project name and task description" });
+  }
+  db("projects")
+    .insert(newProject)
+    .then(() => {
+      db("tasks")
+        .insert(newTask)
+        .then(say => say);
+    })
+    .then(() => {
+      const result = { ...newTask, ...newProject };
+      res.status(200).json({ ...result });
     });
 });
 
