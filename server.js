@@ -72,4 +72,50 @@ server.get("/api/tasks/:id", (req, res) => {
     });
 });
 
+// stretch
+server.get("/api/projects/:id", (req, res) => {
+  const { id } = req.params;
+  db("projects")
+    .where({ id })
+    .first()
+    .then(project => {
+      res.status(200).json(project);
+    });
+});
+
+server.put("/api/projects/:id", (req, res) => {
+  const { id } = req.params;
+  const { project_name, project_description } = req.body;
+  db("projects")
+    .where({ id })
+    .update({ project_name, project_description })
+    .then(id => {
+      res.status(200).json(id);
+    });
+});
+
+server.delete("/api/projects/:id", (req, res) => {
+  const { id } = req.params;
+  db("projects")
+    .del()
+    .where({ id })
+    .then(bool => {
+      res
+        .status(200)
+        .json(!!Number(bool) ? { message: "deleted" } : { message: "error" });
+    });
+});
+
+server.put("/api/tasks/:id", (req, res) => {
+  const { id } = req.params;
+  const { task_completed } = req.body;
+  db("tasks")
+    .where({ id })
+    .first()
+    .update({ task_completed })
+    .then(id => {
+      res.status(200).json(id);
+    });
+});
+
 module.exports = server;
