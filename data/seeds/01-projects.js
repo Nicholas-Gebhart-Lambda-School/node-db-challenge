@@ -1,7 +1,7 @@
 exports.seed = function(knex) {
   return knex("projects").insert([
-    { id: 1, colName: "rowValue1" },
-    { id: 2, colName: "rowValue2" },
-    { id: 3, colName: "rowValue3" }
+    { project_name: "make small" },
+    { project_name: "clean office" },
+    { project_name: "make coffee" }
   ]);
 };
