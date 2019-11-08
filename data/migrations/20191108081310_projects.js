@@ -4,7 +4,7 @@ exports.up = function(knex) {
     table.string("project_name", 255).notNullable();
     table.string("project_description", 255);
     table
-      .boolean("completed")
+      .boolean("project_completed")
       .defaultTo(false)
       .notNullable();
   });
