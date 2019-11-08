@@ -49,4 +49,27 @@ server.post("/api/projects", (req, res) => {
     });
 });
 
+server.get("/api/tasks", (req, res) => {
+  db("tasks").then(tasks => {
+    res.status(200).json(checkTasks(tasks));
+  });
+});
+
+server.get("/api/tasks/:id", (req, res) => {
+  const { id } = req.params;
+  db.select(
+    "p.project_name",
+    "t.task_description",
+    "p.project_description",
+    "t.task_completed",
+    "p.project_completed"
+  )
+    .from("projects as p")
+    .join("tasks as t", "t.project_id", "p.id")
+    .where({ "t.project_id": id })
+    .then(task => {
+      res.status(200).json(checkProjects(checkTasks(task)));
+    });
+});
+
 module.exports = server;
